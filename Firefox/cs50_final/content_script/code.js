@@ -55,3 +55,4 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   // Popup update prüft dann automatisch, dass Timer auf 0 ist
 });
 
+//test git
