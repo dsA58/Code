@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "TODO",
+  "version": "1.0",
+  "description": "Eine einfache Aufgabenliste mit Timer im Popup.",
+  "icons": {
+    "48": "icons/house_48.png"
+  },
+  "permissions": ["tabs", "storage", "alarms"],
+  "background": {
+    "service_worker": "content_script/code.js"
+  },
+  "action": {
+    "default_icon": "icons/house_48.png",
+    "default_title": "TODO",
+    "default_popup": "popup/popup.html"
+  }
+}
