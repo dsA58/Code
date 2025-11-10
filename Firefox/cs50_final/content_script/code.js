@@ -41,6 +41,28 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
     sendResponse({ ok: true });
     return true; // sendResponse async
   }
+
+  if (msg.type === "delete_task") {
+    const { id } = msg;
+
+    let changed = false;
+    if (activeTasks[id]) {
+      delete activeTasks[id];
+      changed = true;
+    }
+    if (pausedTasks[id]) {
+      delete pausedTasks[id];
+      changed = true;
+    }
+
+    if (changed) {
+      await chrome.storage.local.set({ activeTasks, pausedTasks });
+    }
+    chrome.alarms.clear(id);
+
+    sendResponse({ ok: true });
+    return true; // sendResponse async
+  }
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
@@ -54,5 +76,3 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   await chrome.storage.local.set({ activeTasks, pausedTasks });
   // Popup update prüft dann automatisch, dass Timer auf 0 ist
 });
-
-//test git

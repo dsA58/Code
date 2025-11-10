@@ -61,7 +61,7 @@ function createTaskInput(value, time, id) {
   const delBtn = document.createElement("button");
   delBtn.textContent = "🗑️";
   delBtn.addEventListener("click", () => {
-    paus_timer(taskRow);
+    delete_task(taskRow);
     taskRow.remove();
     saveTasks();
   });
@@ -106,6 +106,15 @@ function paus_timer(taskRow) {
   });
 }
 
+// ----- Task löschen (inkl. Timer-Aufräumen) -----
+function delete_task(taskRow) {
+  const id = taskRow.dataset.id;
+  chrome.runtime.sendMessage({
+    type: "delete_task",
+    id
+  });
+}
+
 // ----- Timeranzeige aktualisieren -----
 async function updateTimers() {
   const rows = document.querySelectorAll(".task-row");
@@ -120,7 +129,13 @@ async function updateTimers() {
     const timerInput = row.querySelector('input[type="time"]');
     const task = tasks.find((t) => t.id === id);
 
-    if (activeTasks[id]) {
+    if (pausedTasks[id]) {
+      const remaining = pausedTasks[id].remaining;
+      const hh = String(Math.floor(remaining / 3600)).padStart(2, "0");
+      const mm = String(Math.floor((remaining % 3600) / 60)).padStart(2, "0");
+      const ss = String(remaining % 60).padStart(2, "0");
+      timerInput.value = `${hh}:${mm}:${ss}`;
+    } else if (activeTasks[id]) {
       const remaining = Math.max(0, Math.floor((activeTasks[id].endTime - Date.now()) / 1000));
       const hh = String(Math.floor(remaining / 3600)).padStart(2, "0");
       const mm = String(Math.floor((remaining % 3600) / 60)).padStart(2, "0");
@@ -135,13 +150,6 @@ async function updateTimers() {
           saveNeeded = true;
         }
       }
-
-    } else if (pausedTasks[id]) {
-      const remaining = pausedTasks[id].remaining;
-      const hh = String(Math.floor(remaining / 3600)).padStart(2, "0");
-      const mm = String(Math.floor((remaining % 3600) / 60)).padStart(2, "0");
-      const ss = String(remaining % 60).padStart(2, "0");
-      timerInput.value = `${hh}:${mm}:${ss}`;
     }
   });
 
