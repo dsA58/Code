@@ -1,8 +1,6 @@
 const taskContainer = document.getElementById("task-container");
 const addButton = document.getElementById("add");
 
-let action = 0;
-
 // ----- Aufgaben aus Speicher laden -----
 document.addEventListener("DOMContentLoaded", async () => {
   const result = await chrome.storage.local.get("tasks");
@@ -41,35 +39,36 @@ function createTaskInput(value, time, id) {
   timer.step = 1; // Sekunden erlauben
   timer.value = time || "00:00:00";
 
-  // Start-Button
+  // Start-/Pause-Button
   const staBtn = document.createElement("button");
   staBtn.textContent = "▶️";
   staBtn.classList.add("timer-btn");
+  let isRunning = false; // Zustand nur für diese Zeile
   staBtn.addEventListener("click", () => {
-    if (timer.value.trim() !== "00:00:00" && action === 0) {
+    if (timer.value.trim() !== "00:00:00" && !isRunning) {
       start_timer(taskRow, timer);
       staBtn.textContent = "⏸️";
-      action = 1;
-    } 
-    else if (action === 1){
+      isRunning = true;
+    } else if (isRunning) {
       paus_timer(taskRow);
       staBtn.textContent = "▶️";
-      action = 0;
-    }
-    else{
+      isRunning = false;
+    } else {
       alert("Bitte eine Zeit eingeben!");
     }
   });
 
-  // Clean-Button
+  // Clear-Button
   const clBtn = document.createElement("button");
   clBtn.textContent = "clear";
   clBtn.classList.add("timer-btn");
-  clBtn.addEventListener("click", () => {
+  clBtn.addEventListener("click", async () => {
     if (timer.value.trim() !== "00:00:00") {
-      delete_timer(taskRow);
+      await delete_timer(taskRow);
+      timer.value = "00:00:00";
       staBtn.textContent = "▶️";
-      action = 0;
+      isRunning = false;
+      saveTasks();
     }
   });
 
@@ -140,10 +139,10 @@ function delete_task(taskRow) {
   });
 }
 
-function delete_timer(taskRow) {
+async function delete_timer(taskRow) {
   const id = taskRow.dataset.id;
   paus_timer(taskRow);
-  chrome.runtime.sendMessage({
+  await chrome.runtime.sendMessage({
       type: "delete_timer",
       id
     });

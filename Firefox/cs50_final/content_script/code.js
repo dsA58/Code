@@ -23,7 +23,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
       // Alarm setzen
       chrome.alarms.create(id, { when: endTime });
       sendResponse({ ok: true });
-      return;
+      return true; // async response
     }
 
     if (msg.type === "pause_timer") {
@@ -40,7 +40,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
       }
 
       sendResponse({ ok: true });
-      return;
+      return true; // async response
     }
 
     if (msg.type === "delete_task") {
@@ -63,21 +63,42 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
 
       sendResponse({ ok: true });
       timer_exist = false;
-      return;
+      return true; // async response
     }
 
 
     if (msg.type === "delete_timer") {
       const { id } = msg;
 
+      let changed = false;
       if (activeTasks[id]) {
-          activeTasks[id] = 0;
-        }
+        delete activeTasks[id];
+        changed = true;
+      }
       if (pausedTasks[id]) {
-          pausedTasks[id] = 0;
-        }
-      await chrome.storage.local.set({ activeTasks, pausedTasks });
+        delete pausedTasks[id];
+        changed = true;
+      }
+
+      // Timer-Alarm löschen
       chrome.alarms.clear(id);
+
+      // Tasks-Zeit auf 00:00:00 zurücksetzen
+      try {
+        const { tasks = [] } = await chrome.storage.local.get(["tasks"]);
+        const idx = tasks.findIndex(t => t.id === id);
+        if (idx !== -1) {
+          tasks[idx].time = "00:00:00";
+          await chrome.storage.local.set({ tasks });
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      if (changed) {
+        await chrome.storage.local.set({ activeTasks, pausedTasks });
+      }
+
       sendResponse({ ok: true });
       return true; // sendResponse async
       }
