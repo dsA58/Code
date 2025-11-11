@@ -10,10 +10,6 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
 
     if (msg.type === "start_timer") {
       const { id, duration } = msg;
-      if (timer_exist == false){
-        duration = 0;
-        timer_exist = true;
-      }
       // Wenn Timer pausiert ist, weiter ab Restzeit
       let remainingSeconds = duration;
       if (pausedTasks[id]) {
@@ -36,6 +32,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
       if (activeTasks[id]) {
         const remaining = Math.max(0, Math.floor((activeTasks[id].endTime - Date.now()) / 1000));
         pausedTasks[id] = { remaining };
+        console.log(pausedTasks[id]);
         delete activeTasks[id];
 
         await chrome.storage.local.set({ activeTasks, pausedTasks });
@@ -70,15 +67,14 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
     }
 
 
-  // Wichtig: true zurückgeben, um sendResponse asynchron zu erlauben
     if (msg.type === "delete_timer") {
       const { id } = msg;
 
       if (activeTasks[id]) {
-          activeTasks[id] = "00:00:00";
+          activeTasks[id] = 0;
         }
       if (pausedTasks[id]) {
-          pausedTasks[id] = "00:00:00";
+          pausedTasks[id] = 0;
         }
       await chrome.storage.local.set({ activeTasks, pausedTasks });
       chrome.alarms.clear(id);

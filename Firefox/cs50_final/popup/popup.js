@@ -2,7 +2,6 @@ const taskContainer = document.getElementById("task-container");
 const addButton = document.getElementById("add");
 
 let action = 0;
-let timer_exist = true;
 
 // ----- Aufgaben aus Speicher laden -----
 document.addEventListener("DOMContentLoaded", async () => {
@@ -148,7 +147,6 @@ function delete_timer(taskRow) {
       type: "delete_timer",
       id
     });
-  timer_exist = false;
 }
 
 // ----- Timeranzeige aktualisieren -----
@@ -164,11 +162,7 @@ async function updateTimers() {
     const id = row.dataset.id;
     const timerInput = row.querySelector('input[type="time"]');
     const task = tasks.find((t) => t.id === id);
-    if (!timer_exist){
-      timerInput.value = "00:00:00";
-      timer_exist = true;
-      return;
-    }
+
 
     if (pausedTasks[id] && pausedTasks[id].remaining !== undefined){
       const remaining = pausedTasks[id].remaining;
@@ -184,7 +178,7 @@ async function updateTimers() {
       timerInput.value = `${hh}:${mm}:${ss}`;
 
       // Wenn Timer abgelaufen ist:
-      if (remaining === 0) {
+      if (remaining === 0 || isNaN(remaining)) {
         delete activeTasks[id];
         if (task) {
           task.time = "00:00:00";
