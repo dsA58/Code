@@ -6,7 +6,7 @@
   "icons": {
     "48": "icons/house_48.png"
   },
-  "permissions": ["tabs", "storage", "alarms"],
+  "permissions": ["storage", "alarms"],
   "background": {
     "service_worker": "content_script/code.js"
   },
