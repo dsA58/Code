@@ -176,9 +176,8 @@ async function setupOffscreenDocument(path) {
       justification: 'Play notification sounds for timer completion',
     })
     .then(() => {
-      creating = null;
-      // Give the offscreen document time to initialize
-      return new Promise(resolve => setTimeout(resolve, 100));
+      // Give the offscreen document time to fully initialize on first creation
+      return new Promise(resolve => setTimeout(resolve, 300));
     })
     .catch((error) => {
       creating = null;
@@ -186,6 +185,9 @@ async function setupOffscreenDocument(path) {
       if (!error.message.includes('Only a single offscreen')) {
         throw error;
       }
+    })
+    .finally(() => {
+      creating = null;
     });
     await creating;
   }
