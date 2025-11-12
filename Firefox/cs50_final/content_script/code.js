@@ -119,33 +119,54 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 });
 
 async function playNotificationSound() {
-
-  await setupOffscreenDocument('offscreen/offscreen.html');
-
-  chrome.runtime.sendMessage({ type: 'playSound' });
-
-  chrome.notifications.create({
-    type: "basic",
-    iconUrl: chrome.runtime.getURL("icons/house_48.png"),
-    title: "Timer finished",
-    message: `Timer has finished!`
-  });
+  try {
+    await setupOffscreenDocument('offscreen/offscreen.html');
+    
+    // Send message with retry logic
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        await chrome.runtime.sendMessage({ type: 'playSound' });
+        break; // Success, exit loop
+      } catch (error) {
+        retries--;
+        if (retries > 0) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+        } else {
+          console.error('Failed to send message after retries:', error);
+        }
+      }
+    }
+    
+    chrome.notifications.create({
+      type: "basic",
+      iconUrl: chrome.runtime.getURL("icons/house_48.png"),
+      title: "Timer finished",
+      message: `Timer has finished!`
+    });
+  } catch (error) {
+    console.error('Error playing notification sound:', error);
+  }
 }
 
 async function setupOffscreenDocument(path) {
-  // Check all windows controlled by the service worker to see if one
-  // of them is the offscreen document with the given path
   const offscreenUrl = chrome.runtime.getURL(path);
-  const existingContexts = await chrome.runtime.getContexts({
-    contextTypes: ['OFFSCREEN_DOCUMENT'],
-    documentUrls: [offscreenUrl]
-  });
+  
+  // Check if offscreen document already exists
+  try {
+    const existingContexts = await chrome.runtime.getContexts({
+      contextTypes: ['OFFSCREEN_DOCUMENT'],
+      documentUrls: [offscreenUrl]
+    });
 
-  if (existingContexts.length > 0) {
-    return;
+    if (existingContexts.length > 0) {
+      return;
+    }
+  } catch (e) {
+    // If getContexts fails, try to create anyway
   }
 
-  // create offscreen document
+  // Create offscreen document
   if (creating) {
     await creating;
   } else {
@@ -153,9 +174,20 @@ async function setupOffscreenDocument(path) {
       url: path,
       reasons: ['AUDIO_PLAYBACK'],
       justification: 'Play notification sounds for timer completion',
+    })
+    .then(() => {
+      creating = null;
+      // Give the offscreen document time to initialize
+      return new Promise(resolve => setTimeout(resolve, 100));
+    })
+    .catch((error) => {
+      creating = null;
+      // Document might already exist, ignore error
+      if (!error.message.includes('Only a single offscreen')) {
+        throw error;
+      }
     });
     await creating;
-    creating = null;
   }
 }
 

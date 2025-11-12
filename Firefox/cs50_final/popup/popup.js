@@ -220,6 +220,5 @@ async function updateTimers() {
     await chrome.storage.local.set({ tasks, activeTasks });
   }
 }
-
 // Update-Timer jede Sekunde
 setInterval(updateTimers, 1000);
