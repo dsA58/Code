@@ -42,20 +42,17 @@ function createTaskInput(value, time, id) {
   // Start-/Pause-Button
   const staBtn = document.createElement("button");
   staBtn.textContent = "▶️";
-  staBtn.classList.add("timer-btn", "start-btn");
-  // Der Lauf-Status wird über dataset.running gehalten ("true"/"false")
-  taskRow.dataset.running = taskRow.dataset.running || "false";
-
+  staBtn.classList.add("timer-btn");
+  let isRunning = false; // Zustand nur für diese Zeile
   staBtn.addEventListener("click", () => {
-    const isRunning = taskRow.dataset.running === "true";
     if (timer.value.trim() !== "00:00:00" && !isRunning) {
       start_timer(taskRow, timer);
       staBtn.textContent = "⏸️";
-      taskRow.dataset.running = "true";
+      isRunning = true;
     } else if (isRunning) {
       paus_timer(taskRow);
       staBtn.textContent = "▶️";
-      taskRow.dataset.running = "false";
+      isRunning = false;
     } else {
       alert("Pleas enter a time > 00:00:00!");
     }
@@ -66,11 +63,11 @@ function createTaskInput(value, time, id) {
   clBtn.textContent = "clear";
   clBtn.classList.add("timer-btn");
   clBtn.addEventListener("click", async () => {
-    if (timer.value.trim() !== "00:00:00") {
+    if (timer.value.trim() !== "00:00:00" && isRunning === true ){
       await delete_timer(taskRow);
       timer.value = "00:00:00";
       staBtn.textContent = "▶️";
-      taskRow.dataset.running = "false";
+      isRunning = false;
       saveTasks();
     }
   });
@@ -163,8 +160,8 @@ async function updateTimers() {
   rows.forEach((row) => {
     const id = row.dataset.id;
     const timerInput = row.querySelector('input[type="time"]');
-    const startBtn = row.querySelector('button.start-btn');
     const task = tasks.find((t) => t.id === id);
+
 
     if (pausedTasks[id] && pausedTasks[id].remaining !== undefined){
       const remaining = pausedTasks[id].remaining;
@@ -172,11 +169,6 @@ async function updateTimers() {
       const mm = String(Math.floor((remaining % 3600) / 60)).padStart(2, "0");
       const ss = String(remaining % 60).padStart(2, "0");
       timerInput.value = `${hh}:${mm}:${ss}`;
-      // Pausiert => Play-Icon
-      if (startBtn) {
-        startBtn.textContent = "▶️";
-      }
-      row.dataset.running = "false";
     } else if (activeTasks[id] && activeTasks[id].endTime !== undefined ) {
       const remaining = Math.max(0, Math.floor((activeTasks[id].endTime - Date.now()) / 1000));
       const hh = String(Math.floor(remaining / 3600)).padStart(2, "0");
@@ -184,35 +176,23 @@ async function updateTimers() {
       const ss = String(remaining % 60).padStart(2, "0");
       timerInput.value = `${hh}:${mm}:${ss}`;
 
-      // Läuft => Pause-Icon
-      if (startBtn) {
-        startBtn.textContent = "⏸️";
-      }
-      row.dataset.running = "true";
-
       // Wenn Timer abgelaufen ist:
       if (remaining === 0 || isNaN(remaining)) {
         delete activeTasks[id];
         if (task) {
           task.time = "00:00:00";
           saveNeeded = true;
-          if (startBtn && startBtn.textContent === "⏸️") {
-            startBtn.textContent = "▶️";
+          if (row.querySelector("button.timer-btn").textContent === "⏸️") {
+            row.querySelector("button.timer-btn").textContent = "▶️";
           }
-          row.dataset.running = "false";
           if (task.text.trim() === "") {
             alert(`Timer for task has finished!`);
-          } else {
+          }
+          else{
             alert(`Timer for task "${task.text}" has finished!`);
           }
         }
       }
-    } else {
-      // Kein Status => sicherstellen, dass Start-Icon gesetzt ist
-      if (startBtn) {
-        startBtn.textContent = "▶️";
-      }
-      row.dataset.running = "false";
     }
   });
 
@@ -221,5 +201,8 @@ async function updateTimers() {
   }
 }
 
+
+
 // Update-Timer jede Sekunde
 setInterval(updateTimers, 1000);
+
