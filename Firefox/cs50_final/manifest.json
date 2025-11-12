@@ -21,5 +21,10 @@
       "resources": ["sounds/ding_sound.mp3", "icons/house_48.png"],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+  "offscreen": {
+    "url": "offscreen/offscreen.html",
+    "reasons": ["AUDIO_PLAYBACK"],
+    "justification": "Playing notification sounds when timers complete"
+  }
 }
