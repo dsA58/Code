@@ -15,15 +15,10 @@
     "default_title": "TODO",
     "default_popup": "popup/popup.html"
   },
-  "offscreen_documents": [
-    {
-      "matches": ["<all_urls>"],
-      "html": "offscreen/offscreen.html"
-    }
-  ],
+  
   "web_accessible_resources": [
     {
-      "resources": ["sounds/ding_sound.mp3"],
+      "resources": ["sounds/ding_sound.mp3", "icons/house_48.png"],
       "matches": ["<all_urls>"]
     }
   ]

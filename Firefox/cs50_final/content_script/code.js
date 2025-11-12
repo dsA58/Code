@@ -118,6 +118,12 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 });
 
 function playNotificationSound() {
-  const audio = new Audio(chrome.runtime.getURL("sounds/ding_sound.mp3"));
-  audio.play();
+   chrome.runtime.sendMessage({ type: 'playSound' });
+
+   chrome.notifications.create({
+    type: "basic",
+    iconUrl: "icons/house_48.png",
+    title: "Timer finished",
+    message: `Timer has finished!`
+  });
 }
