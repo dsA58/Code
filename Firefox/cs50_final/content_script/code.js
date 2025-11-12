@@ -89,6 +89,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
         const idx = tasks.findIndex(t => t.id === id);
         if (idx !== -1) {
           tasks[idx].time = "00:00:00";
+          playNotificationSound();
           await chrome.storage.local.set({ tasks });
         }
       } catch (e) {
@@ -112,6 +113,11 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   pausedTasks = data.pausedTasks || {};
 
   delete activeTasks[taskId];
+  playNotificationSound();
   await chrome.storage.local.set({ activeTasks, pausedTasks });
-  // Popup update prüft dann automatisch, dass Timer auf 0 ist
 });
+
+function playNotificationSound() {
+  const audio = new Audio(chrome.runtime.getURL("sounds/ding_sound.mp3"));
+  audio.play();
+}

@@ -6,7 +6,7 @@
   "icons": {
     "48": "icons/house_48.png"
   },
-  "permissions": ["storage", "alarms"],
+  "permissions": ["storage", "alarms", "offscreen", "notifications"],
   "background": {
     "service_worker": "content_script/code.js"
   },
@@ -14,5 +14,17 @@
     "default_icon": "icons/house_48.png",
     "default_title": "TODO",
     "default_popup": "popup/popup.html"
-  }
+  },
+  "offscreen_documents": [
+    {
+      "matches": ["<all_urls>"],
+      "html": "offscreen/offscreen.html"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["sounds/ding_sound.mp3"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
