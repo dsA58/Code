@@ -15,11 +15,6 @@
     "default_title": "TODO",
     "default_popup": "popup/popup.html"
   },
-  "offscreen": {
-    "url": "offscreen/offscreen.html",
-    "reasons": ["AUDIO_PLAYBACK"],
-    "justification": "Playing notification sounds for timer completion"
-  },
   "web_accessible_resources": [
     {
       "resources": ["sounds/ding_sound.mp3", "icons/house_48.png"],
