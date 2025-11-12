@@ -118,15 +118,15 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   await chrome.storage.local.set({ activeTasks, pausedTasks });
 });
 
-function playNotificationSound() {
+async function playNotificationSound() {
 
-  setupOffscreenDocument('offscreen/offscreen.html');
+  await setupOffscreenDocument('offscreen/offscreen.html');
 
-   chrome.runtime.sendMessage({ type: 'playSound' });
+  chrome.runtime.sendMessage({ type: 'playSound' });
 
-   chrome.notifications.create({
+  chrome.notifications.create({
     type: "basic",
-    iconUrl: "icons/house_48.png",
+    iconUrl: chrome.runtime.getURL("icons/house_48.png"),
     title: "Timer finished",
     message: `Timer has finished!`
   });
