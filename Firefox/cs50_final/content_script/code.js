@@ -1,5 +1,6 @@
 let activeTasks = {};      // aktuell laufende Timer
 let pausedTasks = {};      // pausierte Timer (restliche Sekunden)
+let creating; // A global promise to avoid concurrency issues
 
 let timer_exist = true;
 
@@ -118,6 +119,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 });
 
 function playNotificationSound() {
+
+  setupOffscreenDocument('offscreen/offscreen.html');
+
    chrome.runtime.sendMessage({ type: 'playSound' });
 
    chrome.notifications.create({
@@ -127,3 +131,31 @@ function playNotificationSound() {
     message: `Timer has finished!`
   });
 }
+
+async function setupOffscreenDocument(path) {
+  // Check all windows controlled by the service worker to see if one
+  // of them is the offscreen document with the given path
+  const offscreenUrl = chrome.runtime.getURL(path);
+  const existingContexts = await chrome.runtime.getContexts({
+    contextTypes: ['OFFSCREEN_DOCUMENT'],
+    documentUrls: [offscreenUrl]
+  });
+
+  if (existingContexts.length > 0) {
+    return;
+  }
+
+  // create offscreen document
+  if (creating) {
+    await creating;
+  } else {
+    creating = chrome.offscreen.createDocument({
+      url: path,
+      reasons: ['AUDIO_PLAYBACK'],
+      justification: 'Play notification sounds for timer completion',
+    });
+    await creating;
+    creating = null;
+  }
+}
+
