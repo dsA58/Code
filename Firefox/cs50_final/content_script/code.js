@@ -109,13 +109,26 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   const taskId = alarm.name;
 
-  const data = await chrome.storage.local.get(["activeTasks", "pausedTasks"]);
+  const data = await chrome.storage.local.get(["activeTasks", "pausedTasks", "tasks"]);
   activeTasks = data.activeTasks || {};
   pausedTasks = data.pausedTasks || {};
+  const tasks = data.tasks || [];
 
+  // Clear from active tasks
   delete activeTasks[taskId];
+
+  // Mark the task as done and reset time in persistent storage
+  const idx = tasks.findIndex(t => t.id === taskId);
+  if (idx !== -1) {
+    tasks[idx].time = "00:00:00";
+    tasks[idx].done = true;
+  }
+
+  // Persist changes so UI reflects done state next time popup opens
+  await chrome.storage.local.set({ activeTasks, pausedTasks, tasks });
+
+  // Notify user (sound + notification)
   playNotificationSound();
-  await chrome.storage.local.set({ activeTasks, pausedTasks });
 });
 
 async function playNotificationSound() {
