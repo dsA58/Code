@@ -48,6 +48,7 @@ function createTaskInput(value, time, id) {
 
   staBtn.addEventListener("click", () => {
     const isRunning = taskRow.dataset.running === "true";
+    const finished = taskRow.dataset.done;
     if (timer.value.trim() !== "00:00:00" && !isRunning) {
       start_timer(taskRow, timer);
       staBtn.textContent = "⏸️";
@@ -58,6 +59,11 @@ function createTaskInput(value, time, id) {
       taskRow.dataset.running = "false";
     } else {
       alert("Pleas enter a time > 00:00:00!");
+    }
+
+    if (finished === "true") {
+      taskRow.dataset.done = "false";
+      check.src = chrome.runtime.getURL("picture/Wrong.jpg");
     }
   });
 
@@ -83,12 +89,23 @@ function createTaskInput(value, time, id) {
     taskRow.remove();
     saveTasks();
   });
+  // img for done or not done
+  taskRow.dataset.done = taskRow.dataset.done || "false";
+
+  const check = document.createElement("img");
+  check.classList.add("img");
+  if (taskRow.dataset.done === "true") {
+    check.src = chrome.runtime.getURL("picture/Right.jpg");
+  }
+  else {
+    check.src = chrome.runtime.getURL("picture/Wrong.jpg");
+  }
 
   // Änderungen speichern
   input.addEventListener("input", saveTasks);
   timer.addEventListener("input", saveTasks);
 
-  taskRow.append(input, timer, staBtn, clBtn, delBtn);
+  taskRow.append(input, timer, staBtn, clBtn, delBtn, check);
   return taskRow;
 }
 
@@ -164,6 +181,7 @@ async function updateTimers() {
     const id = row.dataset.id;
     const timerInput = row.querySelector('input[type="time"]');
     const startBtn = row.querySelector('button.start-btn');
+    const check = row.querySelector('img.img');
     const task = tasks.find((t) => t.id === id);
 
     if (pausedTasks[id] && pausedTasks[id].remaining !== undefined){
@@ -200,6 +218,15 @@ async function updateTimers() {
             startBtn.textContent = "▶️";
           }
           row.dataset.running = "false";
+
+          row.dataset.done = "true";
+          if (row.dataset.done === "true") {
+            check.src = chrome.runtime.getURL("picture/Right.jpg");
+          }
+          else {
+            check.src = chrome.runtime.getURL("picture/Wrong.jpg");
+          }
+
           if (task.text.trim() === "") {
             alert(`Timer for task has finished!`);
           } else {
@@ -213,6 +240,7 @@ async function updateTimers() {
         startBtn.textContent = "▶️";
       }
       row.dataset.running = "false";
+      row.dataset.done = "true";
     }
   });
 

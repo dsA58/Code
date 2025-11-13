@@ -35,3 +35,8 @@
 .task-row button:last-child:hover {
   opacity: 0.8;
 }
+
+.img {
+  width: 30px;
+  height: 30px;
+}
