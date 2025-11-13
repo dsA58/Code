@@ -122,28 +122,17 @@ async function playNotificationSound() {
   try {
     await setupOffscreenDocument('offscreen/offscreen.html');
     
-    // Send message with retry logic
-    let retries = 3;
-    while (retries > 0) {
-      try {
-        await chrome.runtime.sendMessage({ type: 'playSound' });
-        break; // Success, exit loop
-      } catch (error) {
-        retries--;
-        if (retries > 0) {
-          await new Promise(resolve => setTimeout(resolve, 50));
-        } else {
-          console.error('Failed to send message after retries:', error);
-        }
-      }
-    }
+    // Wait for sound to play successfully
+    const response = await chrome.runtime.sendMessage({ type: 'playSound' });
     
-    chrome.notifications.create({
-      type: "basic",
-      iconUrl: chrome.runtime.getURL("icons/house_48.png"),
-      title: "Timer finished",
-      message: `Timer has finished!`
-    });
+    if (response?.success) {
+      chrome.notifications.create({
+        type: "basic",
+        iconUrl: chrome.runtime.getURL("icons/house_48.png"),
+        title: "Timer finished",
+        message: `Timer has finished!`
+      });
+    }
   } catch (error) {
     console.error('Error playing notification sound:', error);
   }
