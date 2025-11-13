@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const tasks = result.tasks || [];
 
   tasks.forEach((task) => {
-    const taskRow = createTaskInput(task.text, task.time, task.id);
+    const taskRow = createTaskInput(task.text, task.time, task.id, task.done);
     taskContainer.appendChild(taskRow);
   });
 
@@ -22,7 +22,7 @@ addButton.addEventListener("click", async () => {
 });
 
 // ----- Task-Input-Feld erstellen -----
-function createTaskInput(value, time, id) {
+function createTaskInput(value, time, id, done) {
   const taskRow = document.createElement("div");
   taskRow.classList.add("task-row");
   taskRow.dataset.id = id || crypto.randomUUID();
@@ -63,13 +63,13 @@ function createTaskInput(value, time, id) {
 
     if (finished === "true") {
       taskRow.dataset.done = "false";
-      check.src = chrome.runtime.getURL("picture/Wrong.jpg");
+      check_done(taskRow);
     }
   });
 
-  // Clear-Button
+  // Done-Button
   const clBtn = document.createElement("button");
-  clBtn.textContent = "clear";
+  clBtn.textContent = "done";
   clBtn.classList.add("timer-btn");
   clBtn.addEventListener("click", async () => {
     if (timer.value.trim() !== "00:00:00") {
@@ -77,6 +77,9 @@ function createTaskInput(value, time, id) {
       timer.value = "00:00:00";
       staBtn.textContent = "▶️";
       taskRow.dataset.running = "false";
+
+      taskRow.dataset.done = "true";
+      check_done(taskRow);
       saveTasks();
     }
   });
@@ -89,15 +92,14 @@ function createTaskInput(value, time, id) {
     taskRow.remove();
     saveTasks();
   });
-  // img for done or not done
-  taskRow.dataset.done = taskRow.dataset.done || "false";
+// img for done or not done
+  taskRow.dataset.done = (done !== undefined ? String(done) : (taskRow.dataset.done || "false"));
 
   const check = document.createElement("img");
   check.classList.add("img");
   if (taskRow.dataset.done === "true") {
     check.src = chrome.runtime.getURL("picture/Right.jpg");
-  }
-  else {
+  } else {
     check.src = chrome.runtime.getURL("picture/Wrong.jpg");
   }
 
@@ -114,7 +116,8 @@ async function saveTasks() {
   const rows = taskContainer.querySelectorAll(".task-row");
   const tasks = Array.from(rows).map((row) => {
     const [input, timer] = row.querySelectorAll("input");
-    return { id: row.dataset.id, text: input.value, time: timer.value }; 
+    const is_done = row.dataset.done;
+    return { id: row.dataset.id, text: input.value, time: timer.value, done: is_done}; 
   });
   await chrome.storage.local.set({ tasks });
 }
@@ -213,6 +216,7 @@ async function updateTimers() {
         delete activeTasks[id];
         if (task) {
           task.time = "00:00:00";
+          task.done = true;
           saveNeeded = true;
           if (startBtn && startBtn.textContent === "⏸️") {
             startBtn.textContent = "▶️";
@@ -220,32 +224,37 @@ async function updateTimers() {
           row.dataset.running = "false";
 
           row.dataset.done = "true";
-          if (row.dataset.done === "true") {
-            check.src = chrome.runtime.getURL("picture/Right.jpg");
-          }
-          else {
-            check.src = chrome.runtime.getURL("picture/Wrong.jpg");
-          }
-
-          if (task.text.trim() === "") {
-            alert(`Timer for task has finished!`);
-          } else {
-            alert(`Timer for task "${task.text}" has finished!`);
-          }
+          check_done(row);
         }
       }
-    } else {
+  } else {
       // Kein Status => sicherstellen, dass Start-Icon gesetzt ist
       if (startBtn) {
         startBtn.textContent = "▶️";
       }
       row.dataset.running = "false";
-      row.dataset.done = "true";
+
+      // Restore saved done state on load (default to false)
+      if (task && typeof task.done !== "undefined") {
+        row.dataset.done = String(task.done);
+      } else {
+        row.dataset.done = "false";
+      }
+      check_done(row);
     }
   });
 
   if (saveNeeded) {
     await chrome.storage.local.set({ tasks, activeTasks });
+  }
+}
+function check_done(taskRow) {
+  const check = taskRow.querySelector('img.img');
+  if (taskRow.dataset.done === "true") {
+    check.src = chrome.runtime.getURL("picture/Right.jpg");
+  }
+  else {
+    check.src = chrome.runtime.getURL("picture/Wrong.jpg");
   }
 }
 // Update-Timer jede Sekunde
