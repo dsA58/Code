@@ -75,6 +75,13 @@ body {
   background-color: #ffffff;
 }
 
+/* Make inputs and buttons the same height */
+.task-row input[type="text"],
+.task-row input[type="time"],
+.task-row button {
+  height: 21px;
+}
+
 .task-row input[type="text"]::placeholder {
   color: #9ca3af;
 }
@@ -157,7 +164,7 @@ body {
 
 /* Done / not-done icon */
 .img {
-  width: 22px;
-  height: 22px;
+  width: 21px;
+  height: 21px;
   flex-shrink: 0;
 }
