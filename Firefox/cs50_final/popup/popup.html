@@ -2,16 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Task List</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Task Timer</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div id="task-container">
-      
+    <div class="popup-root">
+      <header class="popup-header">
+        <h1 class="popup-title">Task Timer</h1>
+        <p class="popup-subtitle">Plan your tasks and track time directly from this popup.</p>
+      </header>
+
+      <main id="task-container" class="task-list"></main>
+
+      <button id="add" class="primary-btn">+ Add task</button>
     </div>
-    <button id="add">Add Task</button>
 
     <script src="popup.js"></script>
   </body>
 </html>
-
