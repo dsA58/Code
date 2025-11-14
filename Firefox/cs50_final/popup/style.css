@@ -62,7 +62,7 @@ body {
 
 .task-row input[type="time"] {
   flex: 1.2;
-  min-width: 80px; /* smaller so all buttons fit without horizontal scrolling */
+  min-width: 120px; /* wider so the full HH:MM:SS time is clearly visible */
 }
 
 .task-row input[type="text"],
