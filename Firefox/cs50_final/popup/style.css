@@ -106,11 +106,11 @@ body {
   box-shadow: 0 1px 4px rgba(16, 185, 129, 0.45);
 }
 
-.task-row button:last-child {
+.delBtn{
   background: #ef4444;
 }
 
-.task-row button:last-child:hover {
+.delBtn:hover {
   box-shadow: 0 1px 4px rgba(239, 68, 68, 0.45);
 }
 

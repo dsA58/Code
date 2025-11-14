@@ -87,6 +87,7 @@ function createTaskInput(value, time, id, done) {
   // Löschen-Button
   const delBtn = document.createElement("button");
   delBtn.textContent = "🗑️";
+  delBtn.classList.add("delBtn");
   delBtn.addEventListener("click", () => {
     delete_task(taskRow);
     taskRow.remove();
