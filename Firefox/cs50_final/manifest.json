@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "TODO",
+  "name": "Task Timer",
   "version": "1.0",
-  "description": "Eine einfache Aufgabenliste mit Timer im Popup.",
+  "description": "A productivity extension to help you manage your tasks and time effectively.",
   "icons": {
     "48": "icons/house_48_new.png"
   },
