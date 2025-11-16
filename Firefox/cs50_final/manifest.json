@@ -12,7 +12,7 @@
   },
   "action": {
     "default_icon": "icons/house_48_new.png",
-    "default_title": "TODO",
+    "default_title": "Task Timer",
     "default_popup": "popup/popup.html"
   },
   "web_accessible_resources": [
