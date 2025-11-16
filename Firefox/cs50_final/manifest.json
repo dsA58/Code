@@ -4,20 +4,20 @@
   "version": "1.0",
   "description": "Eine einfache Aufgabenliste mit Timer im Popup.",
   "icons": {
-    "48": "icons/house_48_new.jpg"
+    "48": "icons/house_48_new.png"
   },
   "permissions": ["storage", "alarms", "offscreen", "notifications"],
   "background": {
     "service_worker": "content_script/code.js"
   },
   "action": {
-    "default_icon": "icons/house_48_new.jpg",
+    "default_icon": "icons/house_48_new.png",
     "default_title": "TODO",
     "default_popup": "popup/popup.html"
   },
   "web_accessible_resources": [
     {
-      "resources": ["sounds/ding_sound.mp3", "icons/house_48.png"],
+      "resources": ["sounds/ding_sound.mp3", "icons/house_48_new.png"],
       "matches": ["<all_urls>"]
     }
   ]
