@@ -1,5 +1,5 @@
-let activeTasks = {};      // aktuell laufende Timer
-let pausedTasks = {};      // pausierte Timer (restliche Sekunden)
+let activeTasks = {};      // runnig timer
+let pausedTasks = {};      // paused timer
 let creating; // A global promise to avoid concurrency issues
 
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
 
     if (msg.type === "start_timer") {
       const { id, duration } = msg;
-      // Wenn Timer pausiert ist, weiter ab Restzeit
+      // if timer is paused, resume from remaining time
       let remainingSeconds = duration;
       if (pausedTasks[id]) {
         remainingSeconds = pausedTasks[id].remaining;
@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
       activeTasks[id] = { endTime };
       await chrome.storage.local.set({ activeTasks, pausedTasks });
 
-      // Alarm setzen
+      // set alarm
       chrome.alarms.create(id, { when: endTime });
       sendResponse({ ok: true });
       return true; // async response
@@ -77,10 +77,10 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
         changed = true;
       }
 
-      // Timer-Alarm löschen
+      // delete alarm
       chrome.alarms.clear(id);
 
-      // Tasks-Zeit auf 00:00:00 zurücksetzen
+      // set Tasks-Zeit -> 00:00:00
       try {
         const { tasks = [] } = await chrome.storage.local.get(["tasks"]);
         const idx = tasks.findIndex(t => t.id === id);

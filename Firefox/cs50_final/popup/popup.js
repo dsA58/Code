@@ -1,7 +1,7 @@
 const taskContainer = document.getElementById("task-container");
 const addButton = document.getElementById("add");
 
-// ----- Aufgaben aus Speicher laden -----
+// load tawsk from storage
 document.addEventListener("DOMContentLoaded", async () => {
   const result = await chrome.storage.local.get("tasks");
   const tasks = result.tasks || [];
@@ -11,39 +11,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     taskContainer.appendChild(taskRow);
   });
 
-  updateTimers(); // direkt beim Laden einmal die Timer aktualisieren
+  updateTimers(); // Update the timer immediately on load
 });
 
-// ----- Neuen Task hinzufügen -----
+//add new task
 addButton.addEventListener("click", async () => {
   const taskRow = createTaskInput("", "");
   taskContainer.appendChild(taskRow);
   saveTasks();
 });
 
-// ----- Task-Input-Feld erstellen -----
+// crate task input row
 function createTaskInput(value, time, id, done) {
   const taskRow = document.createElement("div");
   taskRow.classList.add("task-row");
   taskRow.dataset.id = id || crypto.randomUUID();
 
-  // Eingabefeld
+  // input feld
   const input = document.createElement("input");
   input.type = "text";
   input.placeholder = "new task";
   input.value = value;
 
-  // Timerfeld
+  // timer input feld
   const timer = document.createElement("input");
   timer.type = "time";
-  timer.step = 1; // Sekunden erlauben
+  timer.step = 1; // add seconds
   timer.value = time || "00:00:00";
 
-  // Start-/Pause-Button
+  // start/pause button
   const staBtn = document.createElement("button");
   staBtn.textContent = "▶️";
   staBtn.classList.add("timer-btn", "start-btn");
-  // Der Lauf-Status wird über dataset.running gehalten ("true"/"false")
+  // keep track of running state
   taskRow.dataset.running = taskRow.dataset.running || "false";
 
   staBtn.addEventListener("click", () => {
@@ -84,7 +84,7 @@ function createTaskInput(value, time, id, done) {
     }
   });
 
-  // Löschen-Button
+  // delete button
   const delBtn = document.createElement("button");
   delBtn.textContent = "🗑️";
   delBtn.classList.add("delBtn");
@@ -104,7 +104,7 @@ function createTaskInput(value, time, id, done) {
     check.src = chrome.runtime.getURL("picture/Wrong.jpg");
   }
 
-  // Änderungen speichern
+  //save on input change
   input.addEventListener("input", saveTasks);
   timer.addEventListener("input", saveTasks);
 
@@ -112,7 +112,7 @@ function createTaskInput(value, time, id, done) {
   return taskRow;
 }
 
-// ----- Aufgaben speichern -----
+// save tasks to storage
 async function saveTasks() {
   const rows = taskContainer.querySelectorAll(".task-row");
   const tasks = Array.from(rows).map((row) => {
@@ -123,7 +123,7 @@ async function saveTasks() {
   await chrome.storage.local.set({ tasks });
 }
 
-// ----- Timer starten -----
+// start timer
 function start_timer(taskRow, timer) {
   const id = taskRow.dataset.id;
   const parts = (timer.value || "").split(":").map((x) => Number(x));
@@ -145,7 +145,7 @@ function start_timer(taskRow, timer) {
   });
 }
 
-// ----- Timer pausieren -----
+// pause timer
 function paus_timer(taskRow) {
   const id = taskRow.dataset.id;
   chrome.runtime.sendMessage({
@@ -154,7 +154,7 @@ function paus_timer(taskRow) {
   });
 }
 
-// ----- Task löschen (inkl. Timer-Aufräumen) -----
+// delete task (row)
 function delete_task(taskRow) {
   const id = taskRow.dataset.id;
   chrome.runtime.sendMessage({
@@ -172,7 +172,7 @@ async function delete_timer(taskRow) {
     });
 }
 
-// ----- Timeranzeige aktualisieren -----
+// update timers in the UI
 async function updateTimers() {
   const rows = document.querySelectorAll(".task-row");
   const data = await chrome.storage.local.get(["activeTasks", "pausedTasks", "tasks"]);
@@ -193,7 +193,7 @@ async function updateTimers() {
       const mm = String(Math.floor((remaining % 3600) / 60)).padStart(2, "0");
       const ss = String(remaining % 60).padStart(2, "0");
       timerInput.value = `${hh}:${mm}:${ss}`;
-      // Pausiert => Play-Icon
+      // pause => Play-Icon
       if (startBtn) {
         startBtn.textContent = "▶️";
       }
@@ -205,13 +205,13 @@ async function updateTimers() {
       const ss = String(remaining % 60).padStart(2, "0");
       timerInput.value = `${hh}:${mm}:${ss}`;
 
-      // Läuft => Pause-Icon
+      // running => Pause-Icon
       if (startBtn) {
         startBtn.textContent = "⏸️";
       }
       row.dataset.running = "true";
 
-      // Wenn Timer abgelaufen ist:
+      // if timer is done
       if (remaining === 0 || isNaN(remaining)) {
         delete activeTasks[id];
         if (task) {
@@ -228,7 +228,7 @@ async function updateTimers() {
         }
       }
   } else {
-      // Kein Status => sicherstellen, dass Start-Icon gesetzt ist
+      // no state => set icon to Play
       if (startBtn) {
         startBtn.textContent = "▶️";
       }
@@ -257,5 +257,5 @@ function check_done(taskRow) {
     check.src = chrome.runtime.getURL("picture/Wrong.jpg");
   }
 }
-// Update-Timer jede Sekunde
+// updat timers every second
 setInterval(updateTimers, 1000);
