@@ -243,10 +243,7 @@ async function updateTimers() {
       }
       row.dataset.running = "false";
 
-      // Restore saved done state on load (default to false)
-      if (task && typeof task.done !== "undefined") {
-        row.dataset.done = String(task.done);
-      } 
+
       check_done(row);
     }
   });
@@ -261,7 +258,7 @@ function check_done(taskRow) {
   if (taskRow.dataset.done === "true") {
     check.src = chrome.runtime.getURL("picture/Right.jpg");
   }
-  else {
+  else if (taskRow.dataset.done === "false") {
     check.src = chrome.runtime.getURL("picture/Wrong.jpg");
   }
 }

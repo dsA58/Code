@@ -143,7 +143,7 @@ async function playNotificationSound(task) {
     if (response?.success) {
       chrome.notifications.create({
         type: "basic",
-        iconUrl: chrome.runtime.getURL("icons/house_48.png"),
+        iconUrl: chrome.runtime.getURL("icons/house_48_new.png"),
         title: "Timer finished",
         message: `Timer  "${task}" has finished!`
       });
