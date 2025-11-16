@@ -90,7 +90,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
         const idx = tasks.findIndex(t => t.id === id);
         if (idx !== -1) {
           tasks[idx].time = "00:00:00";
-          playNotificationSound();
+          playNotificationSound(tasks[idx]?.task || "");
           await chrome.storage.local.set({ tasks });
         }
       } catch (e) {
@@ -105,10 +105,9 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
       return true; // sendResponse async
       }
   });
-
+// when alarm == 0
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   const taskId = alarm.name;
-
   const data = await chrome.storage.local.get(["activeTasks", "pausedTasks", "tasks"]);
   activeTasks = data.activeTasks || {};
   pausedTasks = data.pausedTasks || {};
@@ -128,10 +127,10 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   await chrome.storage.local.set({ activeTasks, pausedTasks, tasks });
 
   // Notify user (sound + notification)
-  playNotificationSound();
+  playNotificationSound(tasks[idx]?.task || "");
 });
 
-async function playNotificationSound() {
+async function playNotificationSound(task) {
   try {
     await setupOffscreenDocument('offscreen/offscreen.html');
     
@@ -143,7 +142,7 @@ async function playNotificationSound() {
         type: "basic",
         iconUrl: chrome.runtime.getURL("icons/house_48.png"),
         title: "Timer finished",
-        message: `Timer has finished!`
+        message: `Timer  "${task}" has finished!`
       });
     }
   } catch (error) {
