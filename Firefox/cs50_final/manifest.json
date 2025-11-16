@@ -11,7 +11,7 @@
     "service_worker": "content_script/code.js"
   },
   "action": {
-    "default_icon": "icons/house_48.png",
+    "default_icon": "icons/(2)house_48.png",
     "default_title": "TODO",
     "default_popup": "popup/popup.html"
   },
