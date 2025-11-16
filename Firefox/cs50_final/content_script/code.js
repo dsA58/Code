@@ -2,8 +2,6 @@ let activeTasks = {};      // aktuell laufende Timer
 let pausedTasks = {};      // pausierte Timer (restliche Sekunden)
 let creating; // A global promise to avoid concurrency issues
 
-let timer_exist = true;
-
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
     const data = await chrome.storage.local.get(["activeTasks", "pausedTasks"]);
     activeTasks = data.activeTasks || {};
@@ -33,7 +31,6 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
       if (activeTasks[id]) {
         const remaining = Math.max(0, Math.floor((activeTasks[id].endTime - Date.now()) / 1000));
         pausedTasks[id] = { remaining };
-        console.log(pausedTasks[id]);
         delete activeTasks[id];
 
         await chrome.storage.local.set({ activeTasks, pausedTasks });
@@ -63,7 +60,6 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
       chrome.alarms.clear(id);
 
       sendResponse({ ok: true });
-      timer_exist = false;
       return true; // async response
     }
 
@@ -90,7 +86,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
         const idx = tasks.findIndex(t => t.id === id);
         if (idx !== -1) {
           tasks[idx].time = "00:00:00";
-          playNotificationSound(tasks[idx]?.task || "");
+          playNotificationSound(tasks[idx]?.text || "");
           await chrome.storage.local.set({ tasks });
         }
       } catch (e) {
@@ -127,7 +123,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   await chrome.storage.local.set({ activeTasks, pausedTasks, tasks });
 
   // Notify user (sound + notification)
-  playNotificationSound(tasks[idx]?.task || "");
+  playNotificationSound(tasks[idx]?.text || "");
 });
 
 async function playNotificationSound(task) {

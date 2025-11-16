@@ -58,7 +58,7 @@ function createTaskInput(value, time, id, done) {
       staBtn.textContent = "▶️";
       taskRow.dataset.running = "false";
     } else {
-      alert("Pleas enter a time > 00:00:00!");
+      alert("Please enter a time > 00:00:00!");
     }
 
     if (finished === "true") {
@@ -185,7 +185,6 @@ async function updateTimers() {
     const id = row.dataset.id;
     const timerInput = row.querySelector('input[type="time"]');
     const startBtn = row.querySelector('button.start-btn');
-    const check = row.querySelector('img.img');
     const task = tasks.find((t) => t.id === id);
 
     if (pausedTasks[id] && pausedTasks[id].remaining !== undefined){
