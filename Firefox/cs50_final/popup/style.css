@@ -1,3 +1,4 @@
+/* Ai (i had a bad lookin Design so i ask a ai and this was waht it made (i mad a few changes to the buttons and img)) */
 /* Base layout */
 * {
   box-sizing: border-box;
@@ -92,7 +93,7 @@ body {
   border-color: #6366f1;
   box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.35);
 }
-
+/* 0.8 Ai */
 /* Buttons */
 .timer-btn {
   background: #22c55e;
@@ -161,10 +162,14 @@ body {
   transform: translateY(0px);
   box-shadow: 0 3px 10px rgba(79, 70, 229, 0.4);
 }
+/*end 0.8 Ai */
 
 /* Done / not-done icon */
+/* me */
 .img {
   width: 21px;
   height: 21px;
   flex-shrink: 0;
 }
+/* end me */
+/* end Ai */

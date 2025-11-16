@@ -1,3 +1,5 @@
+// the prototype was bild by myself
+//to make sure the sound allways plays was mad with Ai
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === "playSound") {
     const audio = new Audio(chrome.runtime.getURL("sounds/ding_sound.mp3"));
@@ -12,7 +14,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         // ignore sendResponse errors
       }
     };
-
+    //Ai
     const playAudio = () => {
       audio.play()
         .then(() => {
@@ -52,3 +54,4 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true; // Keep channel open for async response
   }
 });
+//end Ai

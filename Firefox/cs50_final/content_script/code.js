@@ -1,6 +1,8 @@
 let activeTasks = {};      // runnig timer
 let pausedTasks = {};      // paused timer
+//Ai (-> setupOffscreenDocument)
 let creating; // A global promise to avoid concurrency issues
+//end Ai
 
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
     const data = await chrome.storage.local.get(["activeTasks", "pausedTasks"]);
@@ -29,7 +31,9 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
       const { id } = msg;
 
       if (activeTasks[id]) {
+        //Ai
         const remaining = Math.max(0, Math.floor((activeTasks[id].endTime - Date.now()) / 1000));
+        //end Ai
         pausedTasks[id] = { remaining };
         delete activeTasks[id];
 
@@ -81,6 +85,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
       chrome.alarms.clear(id);
 
       // set Tasks-Zeit -> 00:00:00
+      // 0.5 Ai
       try {
         const { tasks = [] } = await chrome.storage.local.get(["tasks"]);
         const idx = tasks.findIndex(t => t.id === id);
@@ -92,6 +97,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
       } catch (e) {
         // ignore
       }
+      // end 0.5 Ai
 
       if (changed) {
         await chrome.storage.local.set({ activeTasks, pausedTasks });
@@ -123,6 +129,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   await chrome.storage.local.set({ activeTasks, pausedTasks, tasks });
 
   // Notify user (sound + notification)
+  //"?"" -> Ai
   playNotificationSound(tasks[idx]?.text || "");
 });
 
@@ -145,7 +152,7 @@ async function playNotificationSound(task) {
     console.error('Error playing notification sound:', error);
   }
 }
-
+//Ai
 async function setupOffscreenDocument(path) {
   const offscreenUrl = chrome.runtime.getURL(path);
   
@@ -189,4 +196,4 @@ async function setupOffscreenDocument(path) {
     await creating;
   }
 }
-
+//end Ai

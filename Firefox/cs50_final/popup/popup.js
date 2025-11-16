@@ -2,6 +2,8 @@ const taskContainer = document.getElementById("task-container");
 const addButton = document.getElementById("add");
 
 // load tawsk from storage
+// the prototype with storage was all made with ai but i added new buttons and other stuff myself
+//prototype -> input, timer
 document.addEventListener("DOMContentLoaded", async () => {
   const result = await chrome.storage.local.get("tasks");
   const tasks = result.tasks || [];
@@ -13,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   updateTimers(); // Update the timer immediately on load
 });
-
+//end ai
 //add new task
 addButton.addEventListener("click", async () => {
   const taskRow = createTaskInput("", "");
@@ -45,7 +47,7 @@ function createTaskInput(value, time, id, done) {
   staBtn.classList.add("timer-btn", "start-btn");
   // keep track of running state
   taskRow.dataset.running = taskRow.dataset.running || "false";
-
+  //Ai -> (timer.value.trim() !== "00:00:00" && !isRunning)
   staBtn.addEventListener("click", () => {
     const isRunning = taskRow.dataset.running === "true";
     const finished = taskRow.dataset.done;
@@ -93,8 +95,10 @@ function createTaskInput(value, time, id, done) {
     taskRow.remove();
     saveTasks();
   });
-// img for done or not done
+  // img for done or not done
+  //ai
   taskRow.dataset.done = (done !== undefined ? String(done) : (taskRow.dataset.done || "false"));
+  //end ai
 
   const check = document.createElement("img");
   check.classList.add("img");
@@ -113,6 +117,7 @@ function createTaskInput(value, time, id, done) {
 }
 
 // save tasks to storage
+//ai (like i said before (not "done: is_done" this was made by me))
 async function saveTasks() {
   const rows = taskContainer.querySelectorAll(".task-row");
   const tasks = Array.from(rows).map((row) => {
@@ -122,11 +127,14 @@ async function saveTasks() {
   });
   await chrome.storage.local.set({ tasks });
 }
+//end ai
 
 // start timer
-function start_timer(taskRow, timer) {
+async function start_timer(taskRow, timer) {
   const id = taskRow.dataset.id;
+  //ai
   const parts = (timer.value || "").split(":").map((x) => Number(x));
+  //end ai
   if (parts.length !== 3 || parts.some((n) => Number.isNaN(n) || n < 0)) {
     alert("Ungültige Zeit. Bitte HH:MM:SS eingeben.");
     return;
@@ -146,7 +154,7 @@ function start_timer(taskRow, timer) {
 }
 
 // pause timer
-function paus_timer(taskRow) {
+async function paus_timer(taskRow) {
   const id = taskRow.dataset.id;
   chrome.runtime.sendMessage({
     type: "pause_timer",
@@ -155,7 +163,7 @@ function paus_timer(taskRow) {
 }
 
 // delete task (row)
-function delete_task(taskRow) {
+async function delete_task(taskRow) {
   const id = taskRow.dataset.id;
   chrome.runtime.sendMessage({
     type: "delete_task",
@@ -173,6 +181,7 @@ async function delete_timer(taskRow) {
 }
 
 // update timers in the UI
+// ai (i mad a prototype but it had many bugs and this is the fixed version with some of my own code)
 async function updateTimers() {
   const rows = document.querySelectorAll(".task-row");
   const data = await chrome.storage.local.get(["activeTasks", "pausedTasks", "tasks"]);
@@ -237,9 +246,7 @@ async function updateTimers() {
       // Restore saved done state on load (default to false)
       if (task && typeof task.done !== "undefined") {
         row.dataset.done = String(task.done);
-      } else {
-        row.dataset.done = "false";
-      }
+      } 
       check_done(row);
     }
   });
@@ -248,6 +255,7 @@ async function updateTimers() {
     await chrome.storage.local.set({ tasks, activeTasks });
   }
 }
+//end ai
 function check_done(taskRow) {
   const check = taskRow.querySelector('img.img');
   if (taskRow.dataset.done === "true") {
