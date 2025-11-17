@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+    <div class="mb-3">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Stocks</th>
+                    <th>Shares</th>
+                    <th>Price</th>
+                    <th>Total vlaue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {%for quote in quotes%}
+                    <tr>
+                        <th>{{quote.symbol}}</th>
+                        <th>{{quote.number}}</th>
+                        <th>{{ "{:,.2f}".format(quote_prices[loop.index0]) }}$</th>
+                        <th>{{ "{:,.2f}".format(total_prices[loop.index0]) }}$</th>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+            <tfoot>
+                <th>Cash: {{cash}}$</th>
+                <th>Everything in total: {{everthing}}$</th>
+            </tfoot>
+        </table>
+    </div>
+
+{% endblock %}
