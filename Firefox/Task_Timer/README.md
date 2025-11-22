@@ -4,11 +4,11 @@
 
 ## Manifest:
 
-In my project, Task Timer, the most important file is manifest.json. This file contains details of the extension, such as "default_popup": "popup/popup.html". This means that the first pop-up shown is popup.html. I also obtained the necessary permissions in this file, such as alarms or offscreen.
+In my project, Task Timer, the most important file is manifest.json. This file contains details of the extension, such as "default_popup": "popup/popup.html". This means that the first pop-up shown is popup.html. I also obtained the necessary permissions in this file, such as alarms, offscreen, notifications and storage.
 
 ## Popup
 
-The second most important thing is probably the popup folder. This folder contains popup.html, which is the default and only popup, as well as popup.js, which contains the code needed by popup.html, and style. CSS is the file for the style of popup.html, as the name suggests.
+The second most important thing is probably the popup folder. This folder contains popup.html, which is the default and only popup, as well as popup.js, which contains the code needed by popup.html and style.css. Style.css is the file for the style of popup.html, as the name suggests.
 
 ### popup.html
 
@@ -20,7 +20,8 @@ popup.js contains all the code required to save the inputs and add new buttons, 
 
 #### updateTimers
 
->In this function, the program updates the timer if the current task is not paused. To do this, it goes through all the created buttons and, if any of them have a time and are not paused, it decrements the timer by one. When the timer finishes, it removes the timer from the list of active timers, sets the visible time to 00:00:00, and marks the task as done. After that, it calls check_done to set the task status for the user as 'done'. But how does the program get all of these boxes? This is simple: the function “createTaskInput” is called when the “+ Add task” button is pressed.
+>In this function, the program updates the timer, by reading the time from activeTasks, pausedTasks and tasks from chrome.storage.local. Then for each row it checks if the task is paused, if it is the time get sets to the remaing seconds from pausedTask[], if not it computes the new remaing time and sets the timer to it.
+ When the timer finishes, it will get deleted from activeTasks and the visible timeis set to 00:00:00, and marks the task as done. After that, it calls check_done to set the task status for the user as 'done'. But how does the program get all of these boxes? This is simple: the function “createTaskInput” is called when the “+ Add task” button is pressed.
 
 
 #### createTaskInput
@@ -29,7 +30,7 @@ popup.js contains all the code required to save the inputs and add new buttons, 
 
 #### SaveTasks
 
->This function saves all new input and any changes that occur before the task is complete or the timer is 1 second smaller than before (of course, this only happens when the timer stops or something similar; it is not triggered every second and is not included in updateTimers). It uses Chrome storage for the permissions granted in the manifest, but doesn't perform any actions independently. Some people find it easier to use the command "chrome.storage.local.set()" because they don't need to update everything manually.
+>This function just collects the information about text, time, done from each row and saves theme with an id in the chrome storage. It is allways called somethin in the number of rows changes  when something is done or the text changes (-> when text, time or done changes)
 
 ### style.css
 
@@ -41,16 +42,16 @@ This file is in the content_script folder (it is a background service worker) an
 
 #### msg Message
 
->In popup.js, the program sometimes says 'chrome.runtime.sendMessage'. These messages are for code.js. For example, when popup.js sends the message 'start_timer', code.js becomes active. First, it checks what message was sent and then it executes the appropriate code for 'start_timer'. This involves checking whether the timer is paused. If it is, it gets the remaining time and deletes the task for being paused. If it is not, it will simply use the time from the timer (the original time). It then calculates the time when the timer will finish and sets a Chrome alarm for that time.
+>In popup.js, the program sometimes says 'chrome.runtime.sendMessage'. These messages are for code.js. For example, when popup.js sends the message 'start_timer', code.js becomes active. First, it checks what message was sent and then it executes the appropriate code for that message. For example if the message was 'start_timer' the code would check whether the timer is paused or not. If it is, it gets the remaining time and deletes the paused entry. If it is not, it will simply use the time from the timer (the original time). It then calculates the time when the timer will finish and sets a Chrome alarm for that time.
 
 #### Notification and Sound
 
->So the sound and notification are mostly handled by code.js and offscreen.js. When the timer reaches 00:00:00 code.js calls playNotificationSound(). This function first makes sure offscreen.html exist next it sends a message: "playSound" ,which is for offscreen.js, after offscreen.js was successfull it sends a Chrom notification
+>So the sound and notification are mostly handled by code.js and offscreen.js. When the timer reaches 00:00:00 code.js calls playNotificationSound(). This function first makes sure offscreen.html exist next it sends a message: "playSound" ,which is for offscreen.js, after offscreen.js send a successfull response it sends a Chrome notification
 
 ## Offscreen
 ### offscreen.html
 
-offscreen.html has no actual code; it's just there to play the sound and the user never sees it. However, Chrome needs an HTML file for a background script. Also notable is that this file was created in code.js
+offscreen.html has no actual code; it's just there to play the sound and the user never sees it, becauseChrome requires an HTML document to host the offscreen script. Also notable is that this file was created in code.js
 
 ### offscreen.js
 
