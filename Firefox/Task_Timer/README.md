@@ -2,25 +2,50 @@
 ### Video Demo:  <https://youtu.be/4nV8dGj5cmk>
 ### Description:
 ## manifest
-In my project Task Timer the most important file id manifest.json in this file everything is given a Task like: "default_popup": "popup/popup.html" this means that the popup that is shown first is popup.html in this file i also got the permissons that i need like : alarms or offscreen
+
+In my project Task Timer the most important file is manifest.json. In this file everything is given a task like: "default_popup": "popup/popup.html". This means that the popup that is shown first is popup.html. In this file I also got the permissions that I need like: alarms or offscreen.
+
 ## popup
-The propaly second most important thing is the popup folder in thid folder are : popup.html, waht is like i say the deffalt and also only popup, popup.js, this file is for the code that popup.html needs and style.css, waht is like the name says the file for the style off popup.html.
+
+The probably second most important thing is the popup folder. In this folder are: popup.html, what is like I say the default and also only popup, popup.js, this file is for the code that popup.html needs and style.css, what is like the name says the file for the style of popup.html.
+
 ### popup.html
-Now to popup.html. In popup.html is not much code because the most buttons are created in popup.js, thats why the only button is the button called "+ Add task" the rest in popup.html  is only some decorativ text.
+
+Now to popup.html. In popup.html is not much code because most buttons are created in popup.js, that’s why the only button is the button called “+ Add task”. The rest in popup.html is only some decorative text.
+
 ### popup.js
-In popup.js is basicl all off the code to save the inputs and add new buttons, also is there the code for updating the popup, to be specific the timer and status of the task (is it done or not).All the things for updating the popup is in the function "updateTimers".
+
+In popup.js is basically all of the code to save the inputs and add new buttons, also is there the code for updating the popup, to be specific the timer and status of the task (is it done or not). All the things for updating the popup are in the function “updateTimers”.
+
 #### updateTimers
-In this function the programm akktualsiert the timer if the current task is not paused to check that it goes throw all rows off buttons thath were created and if any of them as a time and is not paused it makes the timer go down by one and if the timer hits 00:00:00 it deleats the timer in the storage and sets the time in the popup to 00:00:00 so the user things the timer still exists after that it calls check_done to set the stats for the task fot the user to done also it , but how does the progaramm get all of these boxes and that is simple with the function "createTaskInput" that is called when the button "+ Add task" gets pressed.
+
+>In this function the program aktualisiert the timer if the current task is not paused. To check that, it goes through all rows of buttons that were created and if any of them has a time and is not paused it makes the timer go down by one. And if the timer hits 00:00:00 it deletes the timer in the storage and sets the time in the popup to 00:00:00, so the user thinks the timer still exists. After that it calls check_done to set the stats for the task for the user to done. But how does the program get all of these boxes? That is simple with the function “createTaskInput” that is called when the button “+ Add task” gets pressed.
+
 #### createTaskInput
-The function createTaskInput does the thing that it says it creats a new task input but acctuly it creats a new row with the input field for the text and time but also many buttons like the start- and pausebutton alos the done button which clears the time and a delete button which deleats the row and at least it creats an img wehere the user can see if a task is done or not done the user can creat as many rows as he wants, as long chrome doesn't have a porblem with it, this is usefull if you for example want a timer when the lunch break is so you don't miss it and at the same time a timer your work a other case where this is usfull is if you have a bigger task and want to split it in many small tasks with this addon you can track how many you have done it is also like a list for all task that you have to do.
+
+>The function createTaskInput does the thing that it says: it creates a new task input. But actually it creates a new row with the input field for the text and time but also many buttons like the start- and pause button, also the done button which clears the time and a delete button which deletes the row. And at least it creates an img where the user can see if a task is done or not done. The user can create as many rows as he wants, as long as Chrome doesn’t have a problem with it. This is useful if you for example want a timer when the lunch break is so you don’t miss it and at the same time a timer for your work. Another case where this is useful is if you have a bigger task and want to split it in many small tasks. With this addon you can track how many you have done. It is also like a list for all tasks that you have to do.
+
 #### saveTasks
-This function has the task to save all of the new input and any changes that comes by time like that the taks is done or the timer is now 1 second smaller than befor (of cours only when the timer stopps or something like that it is not triggerd every second and it is also not in updateTimers ) it uses the chrome storage for what the programm got persion in mainfest but it doesnt do anything by it self for some it is easyer to say "chrome.storage.local.set(...)" because you dont need to allways update everything.
+
+>This function has the task to save all of the new input and any changes that come by time like that the task is done or the timer is now 1 second smaller than before (of course only when the timer stops or something like that, it is not triggered every second and it is also not in updateTimers). It uses the Chrome storage for what the program got permission in manifest but it doesn’t do anything by itself. For some it is easier to say “chrome.storage.local.set(…)” because you don’t need to always update everything.
+
 ### style.css
-style.css is the last file in the folder popup and it task is it to make shure that everything looks god by using css. The created Task by "createTaskInput" are also included because all of the added inputs and buttons have classList.add(...) or are directly by there type (like input) called
+
+style.css is the last file in the folder popup and its task is to make sure that everything looks good by using CSS. The created task by “createTaskInput” is also included because all of the added inputs and buttons have classList.add(…) or are directly by their type (like input) called.
+
 ### code.js
-This file is in the contenet_script folder. Code.js is for doing the real calculation and is also the resson why the programm works when the popup is closed, because code.js is allways running not like popup.js which is only running when the popup is opend. While popup.js task is it to make sure the popup is uptodate ,code.js is making sure that popup.js gets the right time and also the informaiton which task exist. In popup.js the programm sometime says :"chrome.runtime.sendMessage" these messages are for code.js for example when popup.js send the Message: "start_timer". Code.js is getting active it first checks what Message was send after that it executes the appropriate code for "star_timer" that would be checking the timer is paused or not ,if it is paused it will get the remaining time and delat the task for being paused if it is not paused it will just use the time from the timer (the orignal time) after that it will calcuated the time when the timer finshs and set a chrome alarm for the calculated time. Also is code.js the indirect resson why the notification from chrome (that is send in code.js) has a custom sound. The programm sends like popup.js a message this meassage is called playSound this is for code ,in the folder offscreen, also it makes sure that everything is correctly set up for palying the sound that includes getting the permisson from chrome to play a sound/creat an element.
+
+This file is in the content_script folder. code.js is for doing the real calculation and is also the reason why the program works when the popup is closed, because code.js is always running, not like popup.js which is only running when the popup is opened. While popup.js task is to make sure the popup is up to date, code.js is making sure that popup.js gets the right time and also the information which tasks exist. 
+#### msg Message
+>In popup.js the program sometimes says: “chrome.runtime.sendMessage”. These messages are for code.js, for example when popup.js sends the message: “start_timer”. code.js is getting active. It first checks what message was sent, after that it executes the appropriate code for “start_timer”. That would be checking if the timer is paused or not. If it is paused it will get the remaining time and delete the task for being paused. If it is not paused it will just use the time from the timer (the original time). After that it will calculate the time when the timer finishes and set a Chrome alarm for the calculated time. 
+#### notification and sound
+>Also is code.js the indirect reason why the notification from Chrome that is sent from code.js has a custom sound. The program sends like popup.js a message. This message is called playSound. This is for code, in the folder offscreen. Also it makes sure that everything is correctly set up for playing the sound. That includes getting the permission from Chrome to play a sound/create an element.
+
 ## offscreen
 ### offscreen.html
-offscreen.html basicly has no code because it is just there for playing the sound and the user also never sees it, but chromo needs a html file for a background script
+
+offscreen.html basically has no code because it is just there for playing the sound and the user also never sees it, but Chrome needs an HTML file for a background script.
+
 ### offscreen.js
-In offscreen.js the only thing that is done is saying audio.play(), but do to the extension the code sometimes has truble and fails to play the sound so i needed to make sure that it allways plays so I had to make sure that the audio is sufficiently loaded so that the sound could play
+
+In offscreen.js the only thing that is done is saying audio.play(), but due to the extension the code sometimes has trouble and fails to play the sound. So I needed to make sure that it always plays, so I had to make sure that the audio is sufficiently loaded so that the sound could play.
